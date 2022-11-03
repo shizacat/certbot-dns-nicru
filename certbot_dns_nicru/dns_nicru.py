@@ -58,10 +58,7 @@ class Authenticator(dns_common.DNSAuthenticator):
     def _perform(self, domain, validation_name, validation):
         try:
             self._get_client().add_record(
-                TXTRecord(validation, self.ttl, name=validation_name),
-                service=self.credentials.conf("service"),
-                zone=self.credentials.conf("zone"),
-
+                TXTRecord(validation, self.ttl, name=validation_name)
             )
         except DnsApiException as e:
             raise errors.PluginError(f"Add record error: {e}")
@@ -70,18 +67,10 @@ class Authenticator(dns_common.DNSAuthenticator):
         client = self._get_client()
 
         try:
-            records = client.records(
-                service=self.credentials.conf("service"),
-                zone=self.credentials.conf("zone"),
-            )
-            for record in records:
+            for record in client.records():
                 if record.name != validation_name:
                     continue
-                client.delete_record(
-                    record_id=record.id,
-                    service=self.credentials.conf("service"),
-                    zone=self.credentials.conf("zone"),
-                )
+                client.delete_record(record_id=record.id)
         except DnsApiException as e:
             raise errors.PluginError(f"Delete record error: {e}")
 
@@ -92,6 +81,8 @@ class Authenticator(dns_common.DNSAuthenticator):
             username=self.credentials.conf("username"),
             password=self.credentials.conf("password"),
             scope=self.credentials.conf("scope"),
+            default_service=self.credentials.conf("service"),
+            default_zone=self.credentials.conf("zone"),
         )
         try:
             client.get_token()
