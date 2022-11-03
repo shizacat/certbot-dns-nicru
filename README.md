@@ -8,7 +8,7 @@ creating, and subsequently removing, TXT records using the nic.ru Remote API.
 # Installation
 
 ```bash
-pip install certbot-dns-nicrus
+pip install certbot-dns-nicru
 ```
 
 
