@@ -3,9 +3,9 @@ import logging
 
 import zope.interface
 
-from nic_api import DnsApi
-from nic_api.models import TXTRecord
-from nic_api.exceptions import DnsApiException
+from sh_nic_api import DnsApi
+from sh_nic_api.models import TXTRecord
+from sh_nic_api.exceptions import DnsApiException
 from certbot import errors
 from certbot import interfaces
 from certbot.plugins import dns_common
