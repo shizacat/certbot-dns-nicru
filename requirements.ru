@@ -4,6 +4,6 @@ setuptools
 requests
 mock
 requests-mock
-git+https://github.com/shizacat/nic-api@1.0.3
+sh-nic-api>=1.0.3
 
 build
