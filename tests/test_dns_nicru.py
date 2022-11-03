@@ -47,11 +47,10 @@ class AuthenticatorTest(
     def test_perform(self):
         self.auth.perform([self.achall])
 
-        expected = [mock.call.add_record(mock.ANY)]
+        expected = [mock.call.add_record(mock.ANY), mock.call.commit()]
         self.assertEqual(expected, self.mock_client.mock_calls)
         self.assertEqual(
-            "_acme-challenge." + DOMAIN,
-            self.mock_client.mock_calls[0][1][0].name
+            "_acme-challenge", self.mock_client.mock_calls[0][1][0].name
         )
 
     def test_cleanup(self):

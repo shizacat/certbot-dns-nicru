@@ -58,18 +58,22 @@ class Authenticator(dns_common.DNSAuthenticator):
     def _perform(self, domain, validation_name, validation):
         client = self._get_client()
         try:
-            client.add_record(
-                TXTRecord(validation, self.ttl, name=validation_name))
+            client.add_record(TXTRecord(
+                txt=validation,
+                ttl=self.ttl,
+                name=validation_name.split(".")[0]
+            ))
             client.commit()
         except DnsApiException as e:
             raise errors.PluginError(f"Add record error: {e}")
 
     def _cleanup(self, domain, validation_name, validation):
         client = self._get_client()
+        name = validation_name.split(".")[0]
 
         try:
             for record in client.records():
-                if record.name != validation_name:
+                if record.name != name:
                     continue
                 client.delete_record(record_id=record.id)
                 client.commit()
