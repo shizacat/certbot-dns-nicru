@@ -39,6 +39,11 @@ dns_nicru_service = DNS_SERVICE_NAME
 dns_nicru_zone = example.com
 ```
 
+Where:
+- application-id, application-token - credentials for oath 2.0, they were got after [registration](https://www.nic.ru/manager/oauth.cgi?step=oauth.app_register) application.
+- nicru_username, nicru_passoword - credentials for access to nic.ru
+- nicru_service - the name of service, it can be taken from page: https://www.nic.ru/manager/services.cgi?step=srv.my_dns
+
 The path to this file can be provided interactively or using the
 ``--dns-nicru-credentials`` command-line argument. Certbot
 records the path to this file for use during renewal, but does not store the
