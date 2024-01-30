@@ -5,5 +5,6 @@ requests
 mock
 requests-mock
 sh-nic-api>=1.0.3
+zope.interface
 
 build
