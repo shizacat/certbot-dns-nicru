@@ -26,7 +26,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         "Obtain certificates using a DNS TXT record "
         "(if you are using nic.ru for DNS)."
     )
-    ttl = 60
+    ttl: int = 60
 
     def __init__(self, *args, **kwargs):
         super(Authenticator, self).__init__(*args, **kwargs)
@@ -39,7 +39,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         )
         add("credentials", help="nic.ru credentials INI file.")
 
-    def more_info(self):  # pylint: disable=missing-docstring,no-self-use
+    def more_info(self) -> str:
         return (
             "This plugin configures a DNS TXT record to respond to "
             "a dns-01 challenge using the nic.ru Remote REST API."
@@ -60,7 +60,7 @@ class Authenticator(dns_common.DNSAuthenticator):
             },
         )
 
-    def _perform(self, domain, validation_name, validation):
+    def _perform(self, domain: str, validation_name: str, validation: str):
         client = self._get_client()
         try:
             client.add_record(TXTRecord(
@@ -72,7 +72,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         except DnsApiException as e:
             raise errors.PluginError(f"Add record error: {e}")
 
-    def _cleanup(self, domain, validation_name, validation):
+    def _cleanup(self, domain: str, validation_name: str, validation: str):
         client = self._get_client()
         name = validation_name.split(".")[0]
 
