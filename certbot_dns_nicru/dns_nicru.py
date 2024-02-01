@@ -16,11 +16,16 @@ logger = logging.getLogger(__name__)
 @zope.interface.implementer(interfaces.IAuthenticator)
 @zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(dns_common.DNSAuthenticator):
-    """DNS Authenticator for nic.ru
-    This Authenticator uses the nic.ru Remote REST API to fulfill a dns-01 challenge.
+    """
+    DNS Authenticator for nic.ru
+    This Authenticator uses the nic.ru Remote REST API
+    to fulfill a dns-01 challenge.
     """
 
-    description = "Obtain certificates using a DNS TXT record (if you are using nic.ru for DNS)."
+    description = (
+        "Obtain certificates using a DNS TXT record "
+        "(if you are using nic.ru for DNS)."
+    )
     ttl = 60
 
     def __init__(self, *args, **kwargs):
@@ -36,8 +41,8 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def more_info(self):  # pylint: disable=missing-docstring,no-self-use
         return (
-            "This plugin configures a DNS TXT record to respond to a dns-01 challenge using "
-            + "the nic.ru Remote REST API."
+            "This plugin configures a DNS TXT record to respond to "
+            "a dns-01 challenge using the nic.ru Remote REST API."
         )
 
     def _setup_credentials(self):
