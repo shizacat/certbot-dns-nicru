@@ -1,7 +1,7 @@
 """Tests for certbot_dns_nicru"""
 
 import sys
-import mock
+from unittest import mock
 
 from certbot.compat import os
 from certbot.plugins import dns_test_common

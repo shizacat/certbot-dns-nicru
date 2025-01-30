@@ -62,16 +62,13 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _perform(self, domain: str, validation_name: str, validation: str):
         client = self._get_client()
-        # Extract everything before the zone name to preserve subdomain structure
-        zone = client.default_zone
-        name = validation_name.replace(f".{zone}", "")
-        # Remove wildcard prefix if present
-        name = name.replace("*.", "")
         try:
             client.add_record(TXTRecord(
                 txt=validation,
                 ttl=self.ttl,
-                name=name
+                name=self._extract_name(
+                    name=validation_name, zone=client.default_zone
+                )
             ))
             client.commit()
         except DnsApiException as e:
@@ -79,12 +76,8 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _cleanup(self, domain: str, validation_name: str, validation: str):
         client = self._get_client()
-        # Extract everything before the zone name to preserve subdomain structure
-        zone = client.default_zone
-        name = validation_name.replace(f".{zone}", "")
-        # Remove wildcard prefix if present
-        name = name.replace("*.", "")
-
+        name = self._extract_name(
+            name=validation_name, zone=client.default_zone)
         try:
             for record in client.records():
                 if record.name != name:
@@ -94,7 +87,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         except DnsApiException as e:
             raise errors.PluginError(f"Delete record error: {e}")
 
-    def _get_client(self):
+    def _get_client(self) -> DnsApi:
         client = DnsApi(
             client_id=self.credentials.conf("client_id"),
             client_secret=self.credentials.conf("client_secret"),
@@ -109,3 +102,14 @@ class Authenticator(dns_common.DNSAuthenticator):
         except DnsApiException as e:
             raise errors.PluginError(f"Get token error: {e}")
         return client
+
+    def _extract_name(self, name: str, zone: str) -> str:
+        """
+        Extract subdomain from validation name
+        """
+        # Extract everything before the zone name
+        # to preserve subdomain structure
+        name = name.replace(f".{zone}", "")
+        # Remove wildcard prefix if present
+        name = name.replace("*.", "")
+        return name
