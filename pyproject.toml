@@ -4,3 +4,48 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "certbot_dns_nicru"
+version = "1.0.0"
+authors = [
+    { name = "Alexey Matveev" }
+]
+description = "This plugin for certbot configures a DNS TXT record to respond to a dns-01 challenge using the nic.ru Remote REST API."
+readme = "README.md"
+license = { text = "Apache Software License" }
+requires-python = ">=3.8"
+keywords = ["certbot", "dns", "nic.ru", "security", "letsencrypt"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Plugins",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Security",
+    "Topic :: System :: Installation/Setup",
+    "Topic :: System :: Networking",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities"
+]
+dependencies = [
+    "acme>=0.29.0",
+    "certbot>=0.34.0",
+    "setuptools",
+    "requests",
+    "zope.interface",
+    "sh-nic-api>=1.0.3"
+]
+
+[project.urls]
+Homepage = "https://github.com/shizacat/certbot-dns-nicru"
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+
+[project.entry-points."certbot.plugins"]
+"dns-nicru" = "certbot_dns_nicru.dns_nicru:Authenticator"
