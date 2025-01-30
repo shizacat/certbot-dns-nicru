@@ -62,11 +62,16 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _perform(self, domain: str, validation_name: str, validation: str):
         client = self._get_client()
+        # Extract everything before the zone name to preserve subdomain structure
+        zone = client.default_zone
+        name = validation_name.replace(f".{zone}", "")
+        # Remove wildcard prefix if present
+        name = name.replace("*.", "")
         try:
             client.add_record(TXTRecord(
                 txt=validation,
                 ttl=self.ttl,
-                name=validation_name.split(".")[0]
+                name=name
             ))
             client.commit()
         except DnsApiException as e:
@@ -74,7 +79,11 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _cleanup(self, domain: str, validation_name: str, validation: str):
         client = self._get_client()
-        name = validation_name.split(".")[0]
+        # Extract everything before the zone name to preserve subdomain structure
+        zone = client.default_zone
+        name = validation_name.replace(f".{zone}", "")
+        # Remove wildcard prefix if present
+        name = name.replace("*.", "")
 
         try:
             for record in client.records():

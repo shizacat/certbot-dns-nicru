@@ -40,13 +40,16 @@ class AuthenticatorTest(
         self.auth = Authenticator(self.config, "dns_nicru")
 
         self.mock_client = mock.MagicMock()
+        # Set up the default_zone property
+        type(self.mock_client).default_zone = mock.PropertyMock(return_value="zone")
         self.auth._get_client = mock.MagicMock(return_value=self.mock_client)
 
         obj.set_display(obj.FileDisplay(sys.stdout, False))
 
     def test_perform(self):
+        type(self.mock_client).default_zone = mock.PropertyMock(return_value="example.com")
         self.auth.perform([self.achall])
-
+        
         expected = [mock.call.add_record(mock.ANY), mock.call.commit()]
         self.assertEqual(expected, self.mock_client.mock_calls)
         self.assertEqual(
@@ -56,3 +59,25 @@ class AuthenticatorTest(
     def test_cleanup(self):
         self.auth._attempt_cleanup = True
         self.auth.cleanup([self.achall])
+
+    def test_perform_with_subdomain(self):
+        from certbot.achallenges import KeyAuthorizationAnnotatedChallenge
+        from acme import challenges
+        import josepy as jose
+
+        challb = challenges.DNS01(token=jose.b64decode("evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ+PCt92wr+oA"))
+        domain = "*.test.example.com"
+
+        # Set up the default_zone property for this test
+        type(self.mock_client).default_zone = mock.PropertyMock(return_value="example.com")
+        achall = KeyAuthorizationAnnotatedChallenge(
+            challb=challb, domain=domain, account_key=jose.JWKRSA.load(test_util.load_vector("rsa512_key.pem")))
+        
+        self.auth.perform([achall])
+
+        expected = [mock.call.add_record(mock.ANY), mock.call.commit()]
+        self.assertEqual(expected, self.mock_client.mock_calls)
+        # Verify that the record name includes the subdomain
+        self.assertEqual(
+            "_acme-challenge.test", self.mock_client.mock_calls[0][1][0].name
+        )
