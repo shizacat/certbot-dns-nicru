@@ -1,13 +1,10 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "certbot_dns_nicru"
-version = "1.0.0"
+dynamic = ["version"]
 authors = [
     { name = "Alexey Matveev" }
 ]
@@ -35,14 +32,22 @@ classifiers = [
 dependencies = [
     "acme>=0.29.0",
     "certbot>=0.34.0",
-    "setuptools",
     "requests",
     "zope.interface",
     "sh-nic-api>=1.0.3"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-coverage",
+]
+
 [project.urls]
 Homepage = "https://github.com/shizacat/certbot-dns-nicru"
+
+[tool.hatch.version]
+path = "certbot_dns_nicru/__init__.py"
 
 [tool.setuptools.packages.find]
 exclude = ["tests"]

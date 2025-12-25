@@ -34,7 +34,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     @classmethod
     def add_parser_arguments(cls, add):  # pylint: disable=arguments-differ
-        super(Authenticator, cls).add_parser_arguments(
+        super().add_parser_arguments(
             add, default_propagation_seconds=120
         )
         add("credentials", help="nic.ru credentials INI file.")
