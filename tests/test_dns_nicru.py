@@ -58,10 +58,6 @@ class AuthenticatorTest(
             "_acme-challenge", self.mock_client.mock_calls[0][1][0].name
         )
 
-    def test_cleanup(self):
-        self.auth._attempt_cleanup = True
-        self.auth.cleanup([self.achall])
-
     def test_perform_with_subdomain(self):
         from certbot.achallenges import KeyAuthorizationAnnotatedChallenge
         from acme import challenges
@@ -90,6 +86,44 @@ class AuthenticatorTest(
         self.assertEqual(
             "_acme-challenge.test", self.mock_client.mock_calls[0][1][0].name
         )
+
+    def test_perform_error(self):
+        self.mock_client.add_record = mock.MagicMock(
+            side_effect=DnsApiException()
+        )
+        with self.assertRaises(errors.PluginError):
+            self.auth.perform([self.achall])
+
+    def test_cleanup(self):
+        self.auth._attempt_cleanup = True
+        self.auth.cleanup([self.achall])
+
+    def test_cleanup_with_record(self):
+        self.mock_client._extract_name = mock.MagicMock(
+            return_value="_acme-challenge"
+        )
+        record = mock.MagicMock()
+        record.name = "_acme-challenge.example.com"
+        record.id = "record-id"
+        self.mock_client.records = mock.MagicMock(
+            return_value=[mock.MagicMock(), record]
+        )
+
+        self.auth._attempt_cleanup = True
+        self.auth.cleanup([self.achall])
+
+        expected = [
+            mock.call.records(),
+            mock.call.delete_record(record_id="record-id"),
+            mock.call.commit(),
+        ]
+        self.assertEqual(expected, self.mock_client.mock_calls)
+
+    def test_cleanup_error(self):
+        self.mock_client.records = mock.MagicMock(side_effect=DnsApiException())
+        self.auth._attempt_cleanup = True
+        with self.assertRaises(errors.PluginError):
+            self.auth.cleanup([self.achall])
 
     def test__get_client(self):
         auth = Authenticator(self.config, "dns_nicru")
