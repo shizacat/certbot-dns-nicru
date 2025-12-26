@@ -30,7 +30,7 @@ class AuthenticatorTest(
                 "dns_nicru_client_secret": "fake-client-secret",
                 "dns_nicru_scope": "empty",
                 "dns_nicru_service": "service",
-                "dns_nicru_zone": "zone"
+                "dns_nicru_zone": "zone",
             },
             path,
         )
@@ -67,13 +67,20 @@ class AuthenticatorTest(
         from acme import challenges
         import josepy as jose
 
-        challb = challenges.DNS01(token=jose.b64decode("evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ+PCt92wr+oA"))
+        challb = challenges.DNS01(
+            token=jose.b64decode("evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ+PCt92wr+oA")
+        )
         domain = "*.test.example.com"
 
         # Set up the default_zone property for this test
         self.mock_client.default_zone = "example.com"
         achall = KeyAuthorizationAnnotatedChallenge(
-            challb=challb, domain=domain, account_key=jose.JWKRSA.load(test_util.load_vector("rsa512_key.pem")))
+            challb=challb,
+            domain=domain,
+            account_key=jose.JWKRSA.load(
+                test_util.load_vector("rsa512_key.pem")
+            ),
+        )
 
         self.auth.perform([achall])
 
